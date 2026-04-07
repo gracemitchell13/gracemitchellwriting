@@ -30,7 +30,7 @@ Groundwork is designed to be the prerequisite to all those other tools. Lightwei
 
 I had a name by the end of day one. A working prototype by the end of day two. It looked like this:
 
-![The Groundwork dashboard, showing five modules: Know Your Organization, Evaluate This Opportunity, Prepare Your Application, Build Your Language Library, and Track Your Pipeline.](/assets/groundwork_screenshot.png)
+<img src="/assets/groundwork_screenshot.png" alt="The Groundwork dashboard, showing five modules: Know Your Organization, Evaluate This Opportunity, Prepare Your Application, Build Your Language Library, and Track Your Pipeline." style="max-width:100%;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);margin:1rem 0">
 
 I imagined a well-made field guide. Something that walked you through the process from beginning to end, and allowed you to learn as you went. A toolkit.
 
