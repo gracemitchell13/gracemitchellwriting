@@ -278,7 +278,7 @@
 <header>
   <div class="header-top">
     <div class="wordmark">Fieldbook <span>Project Tracker</span></div>
-    <div class="surgery-pill">Surgery: Apr 30</div>
+    <div class="surgery-pill" id="surgeryPill"></div>
   </div>
   <nav class="tabs">
     <button class="tab active" data-view="now">Now</button>
@@ -411,9 +411,12 @@
   let items = [], activeFilter = 'All', editingId = null;
 
   const SURGERY = new Date('2026-04-30');
-  const el = document.getElementById('daysLeft');
   const diff = Math.ceil((SURGERY - new Date()) / 86400000);
-  el.textContent = diff > 0 ? diff : diff === 0 ? 'Today' : 'Past';
+  document.getElementById('daysLeft').textContent = diff > 0 ? diff : diff === 0 ? 'Today' : 'Past';
+  const pill = document.getElementById('surgeryPill');
+  if (diff > 0) pill.textContent = `Surgery in ${diff} day${diff === 1 ? '' : 's'}`;
+  else if (diff === 0) pill.textContent = 'Surgery: Today';
+  else pill.textContent = 'Post-Surgery';
 
   col.orderBy('createdAt','asc').onSnapshot(snap => {
     items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
