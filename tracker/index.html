@@ -104,6 +104,69 @@
     }
     .btn-add:hover { opacity: 0.82; }
 
+    .btn-brief {
+      font-family: var(--ff-mono); font-size: 13px; letter-spacing: 0.08em;
+      text-transform: uppercase; background: transparent; color: var(--ink);
+      border: 1.5px solid var(--ink); padding: 10px 18px; border-radius: 3px;
+      cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: all 0.15s;
+    }
+    .btn-brief:hover { background: var(--ink); color: var(--parchment); }
+    .btn-brief:disabled { opacity: 0.5; cursor: default; }
+
+    /* BRIEF PANEL */
+    .brief-panel {
+      background: var(--paper);
+      border: 1.5px solid var(--ink);
+      border-radius: 4px;
+      padding: 20px 22px;
+      margin-bottom: 22px;
+      position: relative;
+    }
+    .brief-panel-header {
+      font-family: var(--ff-mono); font-size: 11px; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--ink-soft); margin-bottom: 14px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .brief-close {
+      background: none; border: none; cursor: pointer;
+      color: var(--ink-faint); font-size: 15px; padding: 0 2px;
+      transition: color 0.12s;
+    }
+    .brief-close:hover { color: var(--surgery); }
+    .brief-item {
+      display: flex; gap: 12px; align-items: flex-start;
+      padding: 10px 0; border-bottom: 1px solid var(--rule);
+    }
+    .brief-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .brief-num {
+      font-family: var(--ff-display); font-size: 22px; font-weight: 700;
+      color: var(--ink-faint); line-height: 1.2; flex-shrink: 0; width: 24px;
+    }
+    .brief-text { font-size: 15px; color: var(--ink-mid); line-height: 1.5; }
+    .brief-text strong { color: var(--ink); font-weight: 600; }
+    .brief-loading {
+      font-family: var(--ff-mono); font-size: 12px; letter-spacing: 0.08em;
+      color: var(--ink-faint); padding: 8px 0; animation: pulse 1.4s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+    /* API KEY PROMPT */
+    .apikey-prompt {
+      display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+    }
+    .apikey-input {
+      flex: 1; min-width: 200px; padding: 7px 10px;
+      border: 1px solid var(--rule-dark); border-radius: 3px;
+      background: var(--parchment); color: var(--ink);
+      font-family: var(--ff-mono); font-size: 13px;
+    }
+    .apikey-input:focus { outline: none; border-color: var(--ink); }
+    .apikey-save {
+      font-family: var(--ff-mono); font-size: 12px; letter-spacing: 0.08em;
+      text-transform: uppercase; padding: 8px 14px; border: none;
+      background: var(--ink); color: var(--parchment); border-radius: 3px; cursor: pointer;
+    }
+
     .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 22px; }
     .filter-chip {
       font-family: var(--ff-mono); font-size: 12px; letter-spacing: 0.08em;
@@ -390,8 +453,12 @@
           <div class="view-title">Everything Active</div>
           <div class="view-sub">All projects and commitments in play</div>
         </div>
-        <button class="btn-add" id="btnAdd">+ Add Item</button>
+        <div style="display:flex;gap:8px;flex-shrink:0;">
+          <button class="btn-brief" id="btnBrief">&#10022; Brief me</button>
+          <button class="btn-add" id="btnAdd">+ Add Item</button>
+        </div>
       </div>
+      <div id="briefPanel" style="display:none;"></div>
       <div class="filters" id="filters">
         <button class="filter-chip active" data-filter="All">All</button>
         <button class="filter-chip" data-filter="Build">Build</button>
@@ -712,6 +779,129 @@
     const done = todos.filter(t => t.done);
     await Promise.all(done.map(t => todocol.doc(t.id).delete()));
   };
+
+  // ── BRIEF ME ──
+  const BRIEF_KEY = 'fieldbook_apikey';
+
+  function showBriefPanel(content) {
+    const panel = document.getElementById('briefPanel');
+    panel.style.display = 'block';
+    panel.innerHTML = content;
+  }
+  function hideBriefPanel() {
+    const panel = document.getElementById('briefPanel');
+    panel.style.display = 'none';
+    panel.innerHTML = '';
+  }
+
+  function briefPanelShell(inner) {
+    return `<div class="brief-panel">
+      <div class="brief-panel-header">
+        <span>&#10022; Today's Focus</span>
+        <button class="brief-close" onclick="hideBriefPanel()">✕</button>
+      </div>
+      ${inner}
+    </div>`;
+  }
+
+  async function runBrief() {
+    let apiKey = localStorage.getItem(BRIEF_KEY);
+
+    if (!apiKey) {
+      showBriefPanel(briefPanelShell(`
+        <p style="font-size:14px;color:var(--ink-soft);margin-bottom:12px;">Enter your Anthropic API key to use this feature. It will be saved locally in your browser.</p>
+        <div class="apikey-prompt">
+          <input class="apikey-input" id="apikeyField" type="password" placeholder="sk-ant-..." />
+          <button class="apikey-save" onclick="saveKeyAndRun()">Save &amp; Run</button>
+        </div>
+      `));
+      return;
+    }
+
+    await callClaude(apiKey);
+  }
+
+  window.saveKeyAndRun = async function() {
+    const key = document.getElementById('apikeyField').value.trim();
+    if (!key.startsWith('sk-')) {
+      alert('That doesn\'t look like a valid Anthropic API key.');
+      return;
+    }
+    localStorage.setItem(BRIEF_KEY, key);
+    await callClaude(key);
+  };
+
+  window.hideBriefPanel = hideBriefPanel;
+
+  async function callClaude(apiKey) {
+    const btn = document.getElementById('btnBrief');
+    btn.disabled = true;
+
+    showBriefPanel(briefPanelShell(`<div class="brief-loading">Reviewing your projects and thinking…</div>`));
+
+    const surgeryDays = Math.ceil((SURGERY - new Date()) / 86400000);
+    const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
+    const projectSummary = items.map(i =>
+      `- ${i.name} [${i.category}] | Status: ${i.status || 'n/a'} | Next: ${i.nextAction || 'n/a'} | Comeback priority: ${i.comebackPriority || 'n/a'} | Deadline: ${i.deadline || 'none'}`
+    ).join('\n');
+
+    const openTodos = todos.filter(t => !t.done).map(t => `- ${t.text}`).join('\n');
+
+    const prompt = `Today is ${today}. Surgery is in ${surgeryDays} days (April 30). After surgery there will be ~2 weeks of recovery.
+
+Here are the active projects and commitments:
+${projectSummary}
+
+Open to-do items (not connected to a project):
+${openTodos || 'None'}
+
+Given this picture, what are the THREE most important things to focus on today? Be specific — name the actual next action, not just the project. Keep each recommendation to 1-2 sentences. Format your response as exactly three items, each starting with the project or area name in bold.`;
+
+    try {
+      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-5',
+          max_tokens: 400,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+
+      if (!resp.ok) {
+        const err = await resp.json();
+        throw new Error(err.error?.message || 'API error');
+      }
+
+      const data = await resp.json();
+      const text = data.content[0].text.trim();
+
+      // Parse into items — split on numbered lines or double newlines
+      const lines = text.split(/\n+/).filter(l => l.trim());
+      const briefs = lines.map(l => l.replace(/^\d+\.\s*/, '').trim()).filter(Boolean);
+
+      const itemsHtml = briefs.slice(0, 3).map((b, i) => {
+        // Bold anything wrapped in ** **
+        const formatted = b.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        return `<div class="brief-item"><div class="brief-num">${i + 1}</div><div class="brief-text">${formatted}</div></div>`;
+      }).join('');
+
+      showBriefPanel(briefPanelShell(itemsHtml || `<div class="brief-text">${text}</div>`));
+
+    } catch(e) {
+      showBriefPanel(briefPanelShell(`<div class="brief-text" style="color:var(--surgery);">Error: ${e.message}. <button onclick="localStorage.removeItem('${BRIEF_KEY}');hideBriefPanel();" style="background:none;border:none;cursor:pointer;color:var(--surgery);text-decoration:underline;font-size:inherit;">Clear API key</button></div>`));
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  document.getElementById('btnBrief').onclick = runBrief;
 </script>
 </body>
 </html>
