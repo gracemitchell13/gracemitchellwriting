@@ -39,10 +39,9 @@
       min-height: 100vh;
     }
 
-    /* HEADER */
+    /* ── HEADER ── */
     header {
-      background: var(--ink);
-      color: var(--parchment);
+      background: var(--ink); color: var(--parchment);
       padding: 20px 32px 0;
       position: sticky; top: 0; z-index: 100;
       box-shadow: 0 2px 14px rgba(0,0,0,0.14);
@@ -51,10 +50,7 @@
       display: flex; align-items: baseline; justify-content: space-between;
       flex-wrap: wrap; gap: 8px; margin-bottom: 14px;
     }
-    .wordmark {
-      font-family: var(--ff-display); font-style: italic;
-      font-size: 28px; color: var(--parchment);
-    }
+    .wordmark { font-family: var(--ff-display); font-style: italic; font-size: 28px; color: var(--parchment); }
     .wordmark span {
       font-style: normal; font-weight: 700; font-size: 13px;
       letter-spacing: 0.12em; text-transform: uppercase;
@@ -65,8 +61,6 @@
       background: var(--surgery); color: #fde8e8;
       padding: 5px 12px; border-radius: 3px; letter-spacing: 0.06em;
     }
-
-    /* TABS */
     .tabs { display: flex; }
     .tab {
       font-family: var(--ff-mono); font-size: 13px;
@@ -79,8 +73,18 @@
     .tab:hover { color: var(--parchment); }
     .tab.active { color: var(--parchment); border-bottom-color: var(--parchment); }
 
-    /* MAIN */
-    main { max-width: 980px; margin: 0 auto; padding: 36px 28px 80px; }
+    /* ── LAYOUT ── */
+    .page-body {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 0;
+      max-width: 1280px;
+      margin: 0 auto;
+      align-items: start;
+    }
+
+    /* ── MAIN ── */
+    main { padding: 36px 32px 80px 32px; min-width: 0; }
     .view { display: none; }
     .view.active { display: block; }
 
@@ -92,17 +96,14 @@
     .view-title { font-family: var(--ff-display); font-size: 30px; font-weight: 500; }
     .view-sub { font-size: 15px; color: var(--ink-soft); font-style: italic; margin-top: 3px; }
 
-    /* ADD BUTTON */
     .btn-add {
       font-family: var(--ff-mono); font-size: 13px; letter-spacing: 0.08em;
       text-transform: uppercase; background: var(--ink); color: var(--parchment);
       border: none; padding: 10px 18px; border-radius: 3px;
-      cursor: pointer; white-space: nowrap; flex-shrink: 0;
-      transition: opacity 0.15s;
+      cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: opacity 0.15s;
     }
     .btn-add:hover { opacity: 0.82; }
 
-    /* FILTERS */
     .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 22px; }
     .filter-chip {
       font-family: var(--ff-mono); font-size: 12px; letter-spacing: 0.08em;
@@ -110,11 +111,9 @@
       border: 1px solid var(--rule-dark); background: var(--paper);
       color: var(--ink-soft); cursor: pointer; transition: all 0.15s;
     }
-    .filter-chip.active, .filter-chip:hover {
-      background: var(--ink); color: var(--parchment); border-color: var(--ink);
-    }
+    .filter-chip.active, .filter-chip:hover { background: var(--ink); color: var(--parchment); border-color: var(--ink); }
 
-    /* CARDS */
+    /* ── CARDS ── */
     .cards { display: grid; gap: 14px; }
     .card {
       background: var(--paper); border: 1px solid var(--rule);
@@ -128,10 +127,7 @@
     .card[data-cat="Writing"]    { border-left-color: var(--write); }
     .card[data-cat="Personal"]   { border-left-color: var(--personal); }
 
-    .card-top {
-      display: flex; align-items: flex-start; justify-content: space-between;
-      gap: 12px; margin-bottom: 8px;
-    }
+    .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
     .card-name { font-family: var(--ff-display); font-size: 20px; font-weight: 500; line-height: 1.3; }
     .card-actions { display: flex; gap: 6px; flex-shrink: 0; }
     .card-btn {
@@ -159,10 +155,7 @@
       text-transform: uppercase; padding: 3px 8px; border-radius: 2px;
       background: var(--parchment); color: var(--ink-soft); border: 1px solid var(--rule);
     }
-    .card-field {
-      font-size: 15px; color: var(--ink-mid); margin-bottom: 5px;
-      display: flex; gap: 8px;
-    }
+    .card-field { font-size: 15px; color: var(--ink-mid); margin-bottom: 5px; display: flex; gap: 8px; }
     .card-field-label {
       font-family: var(--ff-mono); font-size: 11px; letter-spacing: 0.06em;
       text-transform: uppercase; color: var(--ink-faint);
@@ -180,7 +173,157 @@
       padding: 3px 9px; border-radius: 2px; letter-spacing: 0.06em;
     }
 
-    /* MODAL */
+    /* ── TODO SIDEBAR ── */
+    .todo-sidebar {
+      background: var(--paper);
+      border-left: 1px solid var(--rule-dark);
+      min-height: calc(100vh - 120px);
+      padding: 28px 20px 40px;
+      position: sticky;
+      top: 120px;
+    }
+
+    .todo-heading {
+      font-family: var(--ff-display);
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--rule-dark);
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+    }
+    .todo-count {
+      font-family: var(--ff-mono);
+      font-size: 11px;
+      color: var(--ink-faint);
+      letter-spacing: 0.06em;
+    }
+
+    .todo-input-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .todo-input {
+      flex: 1;
+      padding: 7px 10px;
+      border: 1px solid var(--rule-dark);
+      border-radius: 3px;
+      background: var(--parchment);
+      color: var(--ink);
+      font-family: var(--ff-body);
+      font-size: 14px;
+    }
+    .todo-input:focus { outline: none; border-color: var(--ink); }
+    .todo-input::placeholder { color: var(--ink-faint); }
+    .todo-add-btn {
+      padding: 7px 12px;
+      background: var(--ink);
+      color: var(--parchment);
+      border: none;
+      border-radius: 3px;
+      font-family: var(--ff-mono);
+      font-size: 16px;
+      cursor: pointer;
+      line-height: 1;
+      transition: opacity 0.15s;
+    }
+    .todo-add-btn:hover { opacity: 0.8; }
+
+    .todo-list { list-style: none; margin-bottom: 0; }
+
+    .todo-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--rule);
+      group: true;
+    }
+    .todo-item:last-child { border-bottom: none; }
+
+    .todo-check {
+      appearance: none;
+      width: 17px; height: 17px;
+      border: 1.5px solid var(--ink-faint);
+      border-radius: 3px;
+      cursor: pointer;
+      flex-shrink: 0;
+      margin-top: 3px;
+      transition: all 0.15s;
+      position: relative;
+    }
+    .todo-check:checked {
+      background: var(--ink-soft);
+      border-color: var(--ink-soft);
+    }
+    .todo-check:checked::after {
+      content: '✓';
+      position: absolute;
+      top: -1px; left: 1px;
+      font-size: 12px;
+      color: var(--parchment);
+    }
+
+    .todo-text {
+      flex: 1;
+      font-size: 14px;
+      color: var(--ink-mid);
+      line-height: 1.4;
+      padding-top: 1px;
+      word-break: break-word;
+    }
+    .todo-item.done .todo-text {
+      text-decoration: line-through;
+      color: var(--ink-faint);
+    }
+
+    .todo-del {
+      background: none; border: none; cursor: pointer;
+      color: var(--ink-faint); font-size: 13px; padding: 2px 4px;
+      border-radius: 2px; opacity: 0; transition: opacity 0.12s, color 0.12s;
+      flex-shrink: 0; margin-top: 2px;
+    }
+    .todo-item:hover .todo-del { opacity: 1; }
+    .todo-del:hover { color: var(--surgery); }
+
+    .todo-clear-done {
+      font-family: var(--ff-mono); font-size: 10px; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--ink-faint);
+      background: none; border: none; cursor: pointer;
+      padding: 10px 0 0; display: block; transition: color 0.15s;
+    }
+    .todo-clear-done:hover { color: var(--surgery); }
+
+    .todo-empty {
+      font-size: 13px; color: var(--ink-faint); font-style: italic;
+      padding: 8px 0; text-align: center;
+    }
+
+    /* ── COUNTDOWN BANNER ── */
+    .countdown-banner {
+      background: var(--surgery-bg); border: 1px solid #e0bbbb;
+      border-radius: 4px; padding: 16px 20px; margin-bottom: 26px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .countdown-days { font-family: var(--ff-display); font-size: 52px; font-weight: 700; color: var(--surgery); line-height: 1; }
+    .countdown-label { font-size: 15px; color: var(--ink-mid); }
+    .countdown-label strong {
+      display: block; font-family: var(--ff-mono); font-size: 12px;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--surgery); margin-bottom: 2px;
+    }
+
+    /* ── COMEBACK ── */
+    .comeback-group { margin-bottom: 30px; }
+    .comeback-group-label {
+      font-family: var(--ff-mono); font-size: 12px; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--ink-soft);
+      margin-bottom: 12px; padding-bottom: 7px; border-bottom: 1px solid var(--rule);
+    }
+
+    /* ── MODAL ── */
     .modal-overlay {
       display: none; position: fixed; inset: 0;
       background: rgba(20,44,28,0.48); z-index: 200;
@@ -192,81 +335,31 @@
       border-radius: 6px; padding: 30px 30px 24px;
       width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto;
     }
-    .modal-title {
-      font-family: var(--ff-display); font-size: 22px; font-weight: 500;
-      margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--rule);
-    }
+    .modal-title { font-family: var(--ff-display); font-size: 22px; font-weight: 500; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--rule); }
     .form-group { margin-bottom: 16px; }
-    .form-label {
-      display: block; font-family: var(--ff-mono); font-size: 11px;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--ink-soft); margin-bottom: 6px;
-    }
+    .form-label { display: block; font-family: var(--ff-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 6px; }
     .form-input, .form-select, .form-textarea {
       width: 100%; padding: 9px 11px; border: 1px solid var(--rule-dark);
       border-radius: 3px; background: var(--parchment); color: var(--ink);
       font-family: var(--ff-body); font-size: 15px; transition: border-color 0.15s;
     }
-    .form-input:focus, .form-select:focus, .form-textarea:focus {
-      outline: none; border-color: var(--ink);
-    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--ink); }
     .form-textarea { resize: vertical; min-height: 64px; }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    .modal-footer {
-      display: flex; justify-content: flex-end; gap: 8px;
-      margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--rule);
-    }
-    .btn-cancel {
-      font-family: var(--ff-mono); font-size: 12px; letter-spacing: 0.08em;
-      text-transform: uppercase; padding: 9px 18px;
-      border: 1px solid var(--rule-dark); background: transparent;
-      color: var(--ink-soft); border-radius: 3px; cursor: pointer;
-    }
-    .btn-save {
-      font-family: var(--ff-mono); font-size: 12px; letter-spacing: 0.08em;
-      text-transform: uppercase; padding: 9px 18px; border: none;
-      background: var(--ink); color: var(--parchment); border-radius: 3px; cursor: pointer;
-    }
+    .modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--rule); }
+    .btn-cancel { font-family: var(--ff-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; padding: 9px 18px; border: 1px solid var(--rule-dark); background: transparent; color: var(--ink-soft); border-radius: 3px; cursor: pointer; }
+    .btn-save { font-family: var(--ff-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; padding: 9px 18px; border: none; background: var(--ink); color: var(--parchment); border-radius: 3px; cursor: pointer; }
     .btn-save:hover { opacity: 0.85; }
 
-    /* COUNTDOWN */
-    .countdown-banner {
-      background: var(--surgery-bg); border: 1px solid #e0bbbb;
-      border-radius: 4px; padding: 16px 20px; margin-bottom: 26px;
-      display: flex; align-items: center; gap: 16px;
-    }
-    .countdown-days {
-      font-family: var(--ff-display); font-size: 52px;
-      font-weight: 700; color: var(--surgery); line-height: 1;
-    }
-    .countdown-label { font-size: 15px; color: var(--ink-mid); }
-    .countdown-label strong {
-      display: block; font-family: var(--ff-mono); font-size: 12px;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--surgery); margin-bottom: 2px;
-    }
+    /* ── EMPTY / LOADING ── */
+    .empty { text-align: center; padding: 52px 24px; color: var(--ink-soft); font-style: italic; font-size: 17px; }
+    .loading { text-align: center; padding: 52px; font-family: var(--ff-mono); font-size: 12px; letter-spacing: 0.1em; color: var(--ink-faint); }
 
-    /* COMEBACK GROUPS */
-    .comeback-group { margin-bottom: 30px; }
-    .comeback-group-label {
-      font-family: var(--ff-mono); font-size: 12px; letter-spacing: 0.12em;
-      text-transform: uppercase; color: var(--ink-soft);
-      margin-bottom: 12px; padding-bottom: 7px; border-bottom: 1px solid var(--rule);
-    }
-
-    /* EMPTY / LOADING */
-    .empty {
-      text-align: center; padding: 52px 24px;
-      color: var(--ink-soft); font-style: italic; font-size: 17px;
-    }
-    .loading {
-      text-align: center; padding: 52px; font-family: var(--ff-mono);
-      font-size: 12px; letter-spacing: 0.1em; color: var(--ink-faint);
-    }
-
-    @media (max-width: 600px) {
+    @media (max-width: 800px) {
+      .page-body { grid-template-columns: 1fr; }
+      .todo-sidebar { position: static; border-left: none; border-top: 1px solid var(--rule-dark); min-height: auto; }
       header { padding: 16px 16px 0; }
-      main { padding: 22px 16px 60px; }
+      main { padding: 22px 16px 40px; }
       .form-row { grid-template-columns: 1fr; }
       .tab { padding: 10px 14px; font-size: 11px; }
       .wordmark { font-size: 22px; }
@@ -287,54 +380,74 @@
   </nav>
 </header>
 
-<main>
-  <div class="view active" id="view-now">
-    <div class="view-header">
-      <div>
-        <div class="view-title">Everything Active</div>
-        <div class="view-sub">All projects and commitments in play</div>
-      </div>
-      <button class="btn-add" id="btnAdd">+ Add Item</button>
-    </div>
-    <div class="filters" id="filters">
-      <button class="filter-chip active" data-filter="All">All</button>
-      <button class="filter-chip" data-filter="Build">Build</button>
-      <button class="filter-chip" data-filter="Job Search">Job Search</button>
-      <button class="filter-chip" data-filter="Volunteer">Volunteer</button>
-      <button class="filter-chip" data-filter="Writing">Writing</button>
-      <button class="filter-chip" data-filter="Personal">Personal</button>
-    </div>
-    <div class="cards" id="cards-now"><div class="loading">Loading…</div></div>
-  </div>
+<div class="page-body">
 
-  <div class="view" id="view-presurgery">
-    <div class="view-header">
-      <div>
-        <div class="view-title">Before April 30</div>
-        <div class="view-sub">Where each thing needs to be when you go under</div>
+  <!-- ── MAIN CONTENT ── -->
+  <main>
+    <div class="view active" id="view-now">
+      <div class="view-header">
+        <div>
+          <div class="view-title">Everything Active</div>
+          <div class="view-sub">All projects and commitments in play</div>
+        </div>
+        <button class="btn-add" id="btnAdd">+ Add Item</button>
       </div>
-    </div>
-    <div class="countdown-banner">
-      <div class="countdown-days" id="daysLeft">—</div>
-      <div class="countdown-label">
-        <strong>Days until surgery</strong>
-        Use this window. Set stopping points. Hand things off.
+      <div class="filters" id="filters">
+        <button class="filter-chip active" data-filter="All">All</button>
+        <button class="filter-chip" data-filter="Build">Build</button>
+        <button class="filter-chip" data-filter="Job Search">Job Search</button>
+        <button class="filter-chip" data-filter="Volunteer">Volunteer</button>
+        <button class="filter-chip" data-filter="Writing">Writing</button>
+        <button class="filter-chip" data-filter="Personal">Personal</button>
       </div>
+      <div class="cards" id="cards-now"><div class="loading">Loading…</div></div>
     </div>
-    <div class="cards" id="cards-presurgery"><div class="loading">Loading…</div></div>
-  </div>
 
-  <div class="view" id="view-postsurgery">
-    <div class="view-header">
-      <div>
-        <div class="view-title">The Comeback Queue</div>
-        <div class="view-sub">Ordered by what to pick up first — when you're ready</div>
+    <div class="view" id="view-presurgery">
+      <div class="view-header">
+        <div>
+          <div class="view-title">Before April 30</div>
+          <div class="view-sub">Where each thing needs to be when you go under</div>
+        </div>
       </div>
+      <div class="countdown-banner">
+        <div class="countdown-days" id="daysLeft">—</div>
+        <div class="countdown-label">
+          <strong>Days until surgery</strong>
+          Use this window. Set stopping points. Hand things off.
+        </div>
+      </div>
+      <div class="cards" id="cards-presurgery"><div class="loading">Loading…</div></div>
     </div>
-    <div id="cards-postsurgery"><div class="loading">Loading…</div></div>
-  </div>
-</main>
 
+    <div class="view" id="view-postsurgery">
+      <div class="view-header">
+        <div>
+          <div class="view-title">The Comeback Queue</div>
+          <div class="view-sub">Ordered by what to pick up first — when you're ready</div>
+        </div>
+      </div>
+      <div id="cards-postsurgery"><div class="loading">Loading…</div></div>
+    </div>
+  </main>
+
+  <!-- ── TODO SIDEBAR ── -->
+  <aside class="todo-sidebar">
+    <div class="todo-heading">
+      <span>Quick To-Do</span>
+      <span class="todo-count" id="todoCount"></span>
+    </div>
+    <div class="todo-input-row">
+      <input class="todo-input" id="todoInput" type="text" placeholder="Add a task…" maxlength="200" />
+      <button class="todo-add-btn" id="todoAddBtn" title="Add">+</button>
+    </div>
+    <ul class="todo-list" id="todoList"><li class="todo-empty">Nothing here yet.</li></ul>
+    <button class="todo-clear-done" id="todoClearDone" style="display:none;">Clear completed</button>
+  </aside>
+
+</div>
+
+<!-- ── MODAL ── -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <div class="modal-title" id="modalTitle">Add Item</div>
@@ -396,20 +509,19 @@
 </div>
 
 <script>
-  const firebaseConfig = {
+  firebase.initializeApp({
     apiKey:            "AIzaSyBuslisfKpwIJDeHy27ZlAg6brnXAhVTVg",
     authDomain:        "project-tracker-e86e2.firebaseapp.com",
     projectId:         "project-tracker-e86e2",
     storageBucket:     "project-tracker-e86e2.firebasestorage.app",
     messagingSenderId: "950765645671",
     appId:             "1:950765645671:web:2442d16eef6b85b6a349c2"
-  };
-  firebase.initializeApp(firebaseConfig);
+  });
   const db = firebase.firestore();
   const col = db.collection('tracker_items');
+  const todocol = db.collection('todo_items');
 
-  let items = [], activeFilter = 'All', editingId = null;
-
+  // ── SURGERY COUNTDOWN ──
   const SURGERY = new Date('2026-04-30');
   const diff = Math.ceil((SURGERY - new Date()) / 86400000);
   document.getElementById('daysLeft').textContent = diff > 0 ? diff : diff === 0 ? 'Today' : 'Past';
@@ -417,6 +529,9 @@
   if (diff > 0) pill.textContent = `Surgery in ${diff} day${diff === 1 ? '' : 's'}`;
   else if (diff === 0) pill.textContent = 'Surgery: Today';
   else pill.textContent = 'Post-Surgery';
+
+  // ── PROJECTS ──
+  let items = [], activeFilter = 'All', editingId = null;
 
   col.orderBy('createdAt','asc').onSnapshot(snap => {
     items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -513,15 +628,12 @@
   function openEdit(item) {
     editingId = item.id;
     document.getElementById('modalTitle').textContent = 'Edit Item';
-    ['fName','fCat','fStatus','fNext','fSurgeryTarget','fComeback','fDeadline','fNotes'].forEach(id => {
-      const map = {fName:'name',fCat:'category',fStatus:'status',fNext:'nextAction',fSurgeryTarget:'surgeryTarget',fComeback:'comebackPriority',fDeadline:'deadline',fNotes:'notes'};
-      document.getElementById(id).value = item[map[id]] || '';
-    });
+    const map = {fName:'name',fCat:'category',fStatus:'status',fNext:'nextAction',fSurgeryTarget:'surgeryTarget',fComeback:'comebackPriority',fDeadline:'deadline',fNotes:'notes'};
+    Object.keys(map).forEach(id => document.getElementById(id).value = item[map[id]] || '');
     overlay.classList.add('open');
     document.getElementById('fName').focus();
   }
   function closeModal() { overlay.classList.remove('open'); editingId = null; }
-
   document.getElementById('btnAdd').onclick = openAdd;
   document.getElementById('btnCancel').onclick = closeModal;
   overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
@@ -539,6 +651,67 @@
     });
     closeModal();
   });
+
+  // ── TODO SIDEBAR ──
+  let todos = [];
+
+  todocol.orderBy('createdAt','asc').onSnapshot(snap => {
+    todos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderTodos();
+  });
+
+  function renderTodos() {
+    const list = document.getElementById('todoList');
+    const clearBtn = document.getElementById('todoClearDone');
+    const countEl = document.getElementById('todoCount');
+    list.innerHTML = '';
+
+    const open = todos.filter(t => !t.done);
+    const done = todos.filter(t => t.done);
+
+    countEl.textContent = open.length ? `${open.length} left` : '';
+    clearBtn.style.display = done.length ? 'block' : 'none';
+
+    if (!todos.length) {
+      list.innerHTML = '<li class="todo-empty">Nothing here yet.</li>';
+      return;
+    }
+
+    [...open, ...done].forEach(todo => {
+      const li = document.createElement('li');
+      li.className = 'todo-item' + (todo.done ? ' done' : '');
+      li.innerHTML = `
+        <input class="todo-check" type="checkbox" ${todo.done ? 'checked' : ''} />
+        <span class="todo-text">${esc(todo.text)}</span>
+        <button class="todo-del" title="Delete">✕</button>
+      `;
+      li.querySelector('.todo-check').onchange = async (e) => {
+        await todocol.doc(todo.id).update({ done: e.target.checked });
+      };
+      li.querySelector('.todo-del').onclick = async () => {
+        await todocol.doc(todo.id).delete();
+      };
+      list.appendChild(li);
+    });
+  }
+
+  async function addTodo() {
+    const input = document.getElementById('todoInput');
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    await todocol.add({ text, done: false, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+    input.focus();
+  }
+
+  document.getElementById('todoAddBtn').onclick = addTodo;
+  document.getElementById('todoInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') addTodo();
+  });
+  document.getElementById('todoClearDone').onclick = async () => {
+    const done = todos.filter(t => t.done);
+    await Promise.all(done.map(t => todocol.doc(t.id).delete()));
+  };
 </script>
 </body>
 </html>
