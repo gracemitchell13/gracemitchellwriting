@@ -1045,30 +1045,30 @@ Format your response with these exact section headers: "DAY BY DAY", "WEEKLY GOA
       const weekSection  = text.match(/WEEKLY GOALS[\s\S]*?(?=APRIL 29 CHECKLIST|$)/i)?.[0] || '';
       const checkSection = text.match(/APRIL 29 CHECKLIST[\s\S]*$/i)?.[0] || '';
 
-      // Parse day lines
+      // Parse day lines — match any line with a colon that looks like a date/day entry
       const dayLines = daySection.split('\n')
-        .filter(l => /^(mon|tue|wed|thu|fri|sat|sun)/i.test(l.trim()))
+        .filter(l => l.trim() && !/^DAY BY DAY/i.test(l.trim()))
+        .filter(l => l.includes(':'))
         .map(l => {
           const colon = l.indexOf(':');
-          return colon > -1
-            ? { label: l.slice(0, colon).trim(), content: l.slice(colon + 1).trim() }
-            : { label: '', content: l.trim() };
-        });
+          return { label: l.slice(0, colon).replace(/\*+/g,'').trim(), content: l.slice(colon + 1).trim() };
+        })
+        .filter(d => d.label && d.content);
 
-      // Parse week lines
+      // Parse week lines — match any line starting with "Week" or a date range
       const weekLines = weekSection.split('\n')
-        .filter(l => /^week/i.test(l.trim()))
+        .filter(l => l.trim() && !/^WEEKLY GOALS/i.test(l.trim()))
+        .filter(l => l.includes(':'))
         .map(l => {
           const colon = l.indexOf(':');
-          return colon > -1
-            ? { label: l.slice(0, colon).trim(), content: l.slice(colon + 1).trim() }
-            : { label: '', content: l.trim() };
-        });
+          return { label: l.slice(0, colon).replace(/\*+/g,'').trim(), content: l.slice(colon + 1).trim() };
+        })
+        .filter(w => w.label && w.content);
 
-      // Parse checklist
+      // Parse checklist — match bullet, dash, asterisk, number, or checkbox lines
       const checkItems = checkSection.split('\n')
-        .filter(l => /^[-•*]/.test(l.trim()))
-        .map(l => l.replace(/^[-•*]\s*/, '').trim())
+        .filter(l => /^[-•*✓□\d]/.test(l.trim()))
+        .map(l => l.replace(/^[-•*✓□\d.)\s]+/, '').trim())
         .filter(Boolean);
 
       function fmt(s) { return s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>'); }
