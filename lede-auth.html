@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Signing in to The Lede...</title>
+<script>
+  // Catch Supabase auth redirect and forward to The Lede settings page
+  var hash = window.location.hash;
+  if (hash && hash.includes('access_token')) {
+    window.location.replace('https://gracemitchell13.github.io/thelede/settings.html' + hash);
+  } else {
+    window.location.replace('https://gracemitchell13.github.io/thelede/settings.html');
+  }
+</script>
+</head>
+<body>
+  <p style="font-family:sans-serif;text-align:center;margin-top:4rem;color:#888">Signing in to The Lede...</p>
+</body>
+</html>
