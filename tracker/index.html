@@ -414,7 +414,56 @@
     .btn-save { font-family: var(--ff-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; padding: 9px 18px; border: none; background: var(--ink); color: var(--parchment); border-radius: 3px; cursor: pointer; }
     .btn-save:hover { opacity: 0.85; }
 
-    /* ── EMPTY / LOADING ── */
+    /* RUNWAY PLAN PANEL */
+    .runway-panel {
+      background: var(--paper);
+      border: 1.5px solid var(--ink);
+      border-radius: 4px;
+      padding: 22px 24px;
+      margin-bottom: 24px;
+    }
+    .runway-panel-header {
+      font-family: var(--ff-mono); font-size: 11px; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--ink-soft); margin-bottom: 18px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .runway-section { margin-bottom: 20px; }
+    .runway-section:last-child { margin-bottom: 0; }
+    .runway-section-label {
+      font-family: var(--ff-mono); font-size: 11px; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--ink-faint);
+      margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--rule);
+    }
+    .runway-day {
+      display: flex; gap: 14px; align-items: flex-start;
+      padding: 8px 0; border-bottom: 1px solid var(--rule);
+    }
+    .runway-day:last-child { border-bottom: none; }
+    .runway-day-label {
+      font-family: var(--ff-mono); font-size: 12px; font-weight: 500;
+      color: var(--ink-soft); min-width: 80px; flex-shrink: 0; padding-top: 1px;
+      letter-spacing: 0.04em;
+    }
+    .runway-day-content { font-size: 15px; color: var(--ink-mid); line-height: 1.5; }
+    .runway-day-content strong { color: var(--ink); }
+    .runway-week {
+      padding: 10px 14px; background: var(--parchment);
+      border-radius: 3px; margin-bottom: 8px; border-left: 3px solid var(--ink-faint);
+    }
+    .runway-week:last-child { margin-bottom: 0; }
+    .runway-week-label {
+      font-family: var(--ff-mono); font-size: 11px; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--ink-soft); margin-bottom: 4px;
+    }
+    .runway-week-content { font-size: 15px; color: var(--ink-mid); line-height: 1.5; }
+    .runway-week-content strong { color: var(--ink); }
+    .runway-checklist { list-style: none; }
+    .runway-checklist li {
+      font-size: 15px; color: var(--ink-mid); padding: 5px 0;
+      border-bottom: 1px solid var(--rule); display: flex; gap: 8px;
+    }
+    .runway-checklist li:last-child { border-bottom: none; }
+    .runway-checklist li::before { content: '□'; color: var(--ink-faint); flex-shrink: 0; }
     .empty { text-align: center; padding: 52px 24px; color: var(--ink-soft); font-style: italic; font-size: 17px; }
     .loading { text-align: center; padding: 52px; font-family: var(--ff-mono); font-size: 12px; letter-spacing: 0.1em; color: var(--ink-faint); }
 
@@ -476,7 +525,9 @@
           <div class="view-title">Before April 30</div>
           <div class="view-sub">Where each thing needs to be when you go under</div>
         </div>
+        <button class="btn-brief" id="btnRunway">&#10022; Plan my runway</button>
       </div>
+      <div id="runwayPanel" style="display:none;"></div>
       <div class="countdown-banner">
         <div class="countdown-days" id="daysLeft">—</div>
         <div class="countdown-label">
@@ -902,6 +953,167 @@ Given this picture, what are the THREE most important things to focus on today? 
   }
 
   document.getElementById('btnBrief').onclick = runBrief;
+
+  // ── PLAN MY RUNWAY ──
+  function showRunwayPanel(content) {
+    const panel = document.getElementById('runwayPanel');
+    panel.style.display = 'block';
+    panel.innerHTML = content;
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  function hideRunwayPanel() {
+    const panel = document.getElementById('runwayPanel');
+    panel.style.display = 'none';
+    panel.innerHTML = '';
+  }
+  window.hideRunwayPanel = hideRunwayPanel;
+
+  async function runRunway() {
+    const apiKey = localStorage.getItem(BRIEF_KEY);
+    if (!apiKey) {
+      // reuse brief me's key prompt flow — switch to Now tab first
+      document.querySelector('[data-view="now"]').click();
+      runBrief();
+      return;
+    }
+
+    const btn = document.getElementById('btnRunway');
+    btn.disabled = true;
+
+    showRunwayPanel(`<div class="runway-panel"><div class="runway-panel-header"><span>&#10022; Building your runway plan…</span></div><div class="brief-loading">Reading your projects and mapping the next 22 days…</div></div>`);
+
+    const surgeryDays = Math.ceil((SURGERY - new Date()) / 86400000);
+    const today = new Date();
+    const todayStr = today.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
+    // Build day labels for next 7 days
+    const dayLabels = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() + i);
+      dayLabels.push(d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }));
+    }
+
+    const projectSummary = items.map(i =>
+      `- ${i.name} [${i.category}] | Status: ${i.status || 'n/a'} | Next action: ${i.nextAction || 'n/a'} | Pre-surgery target: ${i.surgeryTarget || 'n/a'} | Comeback priority: ${i.comebackPriority || 'n/a'} | Deadline: ${i.deadline || 'none'}`
+    ).join('\n');
+
+    const prompt = `Today is ${todayStr}. Surgery is on April 30 — that is ${surgeryDays} days from now. After surgery there will be approximately 2 weeks of recovery with no work capacity.
+
+Here are all active projects and commitments with their pre-surgery target states:
+${projectSummary}
+
+Please create a realistic pre-surgery runway plan in this exact structure:
+
+SECTION 1 — DAY BY DAY (next 7 days)
+For each of the next 7 days (${dayLabels.join(', ')}), give a specific daily focus. One primary thing to work on, and optionally one secondary thing. Keep each to 1-2 sentences. Be concrete — name the actual task, not just the project.
+
+SECTION 2 — WEEKLY GOALS
+For each remaining week after Day 7 up to April 29, give a weekly theme and 2-3 specific goals for that week.
+
+SECTION 3 — APRIL 29 CHECKLIST
+List 5-7 concrete things that should be true or done by end of day April 29 so everything is cleanly paused before surgery.
+
+Format your response with these exact section headers: "DAY BY DAY", "WEEKLY GOALS", "APRIL 29 CHECKLIST". Under DAY BY DAY, format each day as "DAYNAME DATE: content". Under WEEKLY GOALS, format each as "WEEK OF DATE: content". Under APRIL 29 CHECKLIST, use a simple bullet list.`;
+
+    try {
+      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-5',
+          max_tokens: 1200,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+
+      if (!resp.ok) {
+        const err = await resp.json();
+        throw new Error(err.error?.message || 'API error');
+      }
+
+      const data = await resp.json();
+      const text = data.content[0].text.trim();
+
+      // Parse sections
+      const daySection   = text.match(/DAY BY DAY[\s\S]*?(?=WEEKLY GOALS|$)/i)?.[0] || '';
+      const weekSection  = text.match(/WEEKLY GOALS[\s\S]*?(?=APRIL 29 CHECKLIST|$)/i)?.[0] || '';
+      const checkSection = text.match(/APRIL 29 CHECKLIST[\s\S]*$/i)?.[0] || '';
+
+      // Parse day lines
+      const dayLines = daySection.split('\n')
+        .filter(l => /^(mon|tue|wed|thu|fri|sat|sun)/i.test(l.trim()))
+        .map(l => {
+          const colon = l.indexOf(':');
+          return colon > -1
+            ? { label: l.slice(0, colon).trim(), content: l.slice(colon + 1).trim() }
+            : { label: '', content: l.trim() };
+        });
+
+      // Parse week lines
+      const weekLines = weekSection.split('\n')
+        .filter(l => /^week/i.test(l.trim()))
+        .map(l => {
+          const colon = l.indexOf(':');
+          return colon > -1
+            ? { label: l.slice(0, colon).trim(), content: l.slice(colon + 1).trim() }
+            : { label: '', content: l.trim() };
+        });
+
+      // Parse checklist
+      const checkItems = checkSection.split('\n')
+        .filter(l => /^[-•*]/.test(l.trim()))
+        .map(l => l.replace(/^[-•*]\s*/, '').trim())
+        .filter(Boolean);
+
+      function fmt(s) { return s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>'); }
+
+      const daysHtml = dayLines.length
+        ? dayLines.map(d => `<div class="runway-day"><div class="runway-day-label">${d.label}</div><div class="runway-day-content">${fmt(d.content)}</div></div>`).join('')
+        : `<div class="runway-day-content" style="color:var(--ink-faint);font-style:italic;">No day-by-day data returned.</div>`;
+
+      const weeksHtml = weekLines.length
+        ? weekLines.map(w => `<div class="runway-week"><div class="runway-week-label">${w.label}</div><div class="runway-week-content">${fmt(w.content)}</div></div>`).join('')
+        : `<div class="runway-week-content" style="color:var(--ink-faint);font-style:italic;">No weekly data returned.</div>`;
+
+      const checkHtml = checkItems.length
+        ? `<ul class="runway-checklist">${checkItems.map(c => `<li>${fmt(c)}</li>`).join('')}</ul>`
+        : `<div style="color:var(--ink-faint);font-style:italic;font-size:15px;">No checklist returned.</div>`;
+
+      showRunwayPanel(`
+        <div class="runway-panel">
+          <div class="runway-panel-header">
+            <span>&#10022; Your Runway Plan — ${surgeryDays} days to surgery</span>
+            <button class="brief-close" onclick="hideRunwayPanel()">✕</button>
+          </div>
+          <div class="runway-section">
+            <div class="runway-section-label">Day by Day — Next 7 Days</div>
+            ${daysHtml}
+          </div>
+          <div class="runway-section">
+            <div class="runway-section-label">Weekly Goals — Through Apr 29</div>
+            ${weeksHtml}
+          </div>
+          <div class="runway-section">
+            <div class="runway-section-label">April 29 Checklist</div>
+            ${checkHtml}
+          </div>
+        </div>
+      `);
+
+    } catch(e) {
+      showRunwayPanel(`<div class="runway-panel"><div class="runway-panel-header"><span>Error</span><button class="brief-close" onclick="hideRunwayPanel()">✕</button></div><div class="brief-text" style="color:var(--surgery);">${e.message}</div></div>`);
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  document.getElementById('btnRunway').onclick = runRunway;
 </script>
 </body>
 </html>
